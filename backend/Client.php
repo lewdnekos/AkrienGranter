@@ -5,7 +5,7 @@ namespace DiscordWebhooks;
 /**
  * Client generates the payload and sends the webhook payload to Discord
  * @author nopjmp
- * https://github.com/nopjmp/discord-webhooks/blob/master/DiscordWebhooks/Client.php
+ * @source https://github.com/nopjmp/discord-webhooks/blob/master/DiscordWebhooks/Client.php
  */
 class Client
 {
