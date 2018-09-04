@@ -1,6 +1,10 @@
 # Akrien Granter
 Online AAL application granting tool using AAL API
 
+### How to use
+* Make a POST request to add.php with `username` (username of the user) and `key` (the key from your config file) fields
+* Parse JSON response
+
 ### Setting up
 * Copy all required files from /backend
 * Generate a Client ID (UUID generator can be user as well)
