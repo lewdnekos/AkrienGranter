@@ -36,6 +36,7 @@
 	$userToken = $array["userToken"];
 	$discordLink = $array["discordLink"];
 	$authKey = $array["authKey"];
+	$appID = $array["appID"];
 
 	// Lockdown check
 	if($lockdown){
@@ -52,7 +53,7 @@
 	}
 	// AAL API parameters
 	$username = $_POST['username'];
-	$uri = 'http://alphaantileak.net/api/v3/apps/abc646ea-07b6-443f-b7c7-ae319aa4e693/users/' . $username;
+	$uri = 'http://alphaantileak.net/api/v3/apps/" . $appID . /users/' . $username;
 	$jsonTime = "{}"; // Unlimited time
 
 	// cURL Initialization
