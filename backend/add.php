@@ -37,6 +37,7 @@
 	$discordLink = $array["discordLink"];
 	$authKey = $array["authKey"];
 	$appID = $array["appID"];
+	$discordLog = $array["discord-log"];
 
 	// Lockdown check
 	if($lockdown){
@@ -70,70 +71,72 @@
 	$out = curl_exec($ch);
 	curl_close($ch);
 
-	// Discord webhook logging
-	$webhook = new Client($discordLink);
-	$embed = new Embed();
-
 	// Error check
 	$isError = $out != "{}";
 
-	if($isError){
-		$embed->title("Akrien Granter - Error");
-	}else{
-		$embed->title("Akrien Granter - New user");
+	if($discordLog) {
+		// Discord webhook logging
+		$webhook = new Client($discordLink);
+		$embed = new Embed();
+
+		if($isError){
+			$embed->title("Akrien Granter - Error");
+		}else{
+			$embed->title("Akrien Granter - New user");
+		}
+
+		// User info
+		$embed->field("Username", $username, true);
+		$embed->field("Date", date("Y-m-d H:i:s"), true);
+		$embed->field("IP", $_SERVER['REMOTE_ADDR'], true);
+
+		$error = "";
+		$browser = new Browser();
+
+		// Browser info
+		$browserName = $browser->getBrowser();
+		$browserVersion = $browser->getVersion();
+		$browserData = $browserName . " " . $browserVersion;
+
+		// Addiditional checks
+		if($isError){
+			$json = (array) json_decode($out, true);
+			$error = $json['error'];
+		}
+
+		if($isError){
+			$embed->field("Error code", $error, true);
+			$embed->color(16711680); // Red
+		}else{
+			$embed->color(65280); // Green
+		}
+
+		$screenSize = null;
+		session_start();
+
+		// Screen information to get user's fingerprint
+		if(isset($_SESSION['screen_width']) && isset($_SESSION['screen_height'])){
+		    $screenSize = $_SESSION['screen_width'] . "x" . $_SESSION['screen_height'];
+		}
+
+		$osInfo = getOS($_SERVER['HTTP_USER_AGENT']);
+		$fingerprint = $browserData . "-" . $osInfo;
+
+		if($screenSize != null){
+			$fingerprint .= "-" . $screenSize;
+		}
+
+		// Hash the fingerprint
+		$fingerprint = strtolower(md5($fingerprint));
+
+		// Field the Discord response
+		$embed->field("OS", $osInfo, true);
+		$embed->field("Browser", $browserData, true);
+		$embed->field("Fingerprint", $fingerprint, true);
+
+		// Send log
+		$webhook->embed($embed)->send();
 	}
-
-	// User info
-	$embed->field("Username", $username, true);
-	$embed->field("Date", date("Y-m-d H:i:s"), true);
-	$embed->field("IP", $_SERVER['REMOTE_ADDR'], true);
-
-	$error = "";
-	$browser = new Browser();
-
-	// Browser info
-	$browserName = $browser->getBrowser();
-	$browserVersion = $browser->getVersion();
-	$browserData = $browserName . " " . $browserVersion;
-
-	// Addiditional checks
-	if($isError){
-		$json = (array) json_decode($out, true);
-		$error = $json['error'];
-	}
-
-	if($isError){
-		$embed->field("Error code", $error, true);
-		$embed->color(16711680); // Red
-	}else{
-		$embed->color(65280); // Green
-	}
-
-	$screenSize = null;
-	session_start();
-
-	// Screen information to get user's fingerprint
-	if(isset($_SESSION['screen_width']) && isset($_SESSION['screen_height'])){
-	    $screenSize = $_SESSION['screen_width'] . "x" . $_SESSION['screen_height'];
-	}
-
-	$osInfo = getOS($_SERVER['HTTP_USER_AGENT']);
-	$fingerprint = $browserData . "-" . $osInfo;
-
-	if($screenSize != null){
-		$fingerprint .= "-" . $screenSize;
-	}
-
-	// Hash the fingerprint
-	$fingerprint = strtolower(md5($fingerprint));
-
-	// Field the Discord response
-	$embed->field("OS", $osInfo, true);
-	$embed->field("Browser", $browserData, true);
-	$embed->field("Fingerprint", $fingerprint, true);
-
-	// Send log
-	$webhook->embed($embed)->send();
 
 	// Final response to the user
 	if(!$isError){
