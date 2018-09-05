@@ -3,5 +3,6 @@
 	"userToken": "",
 	"authKey": "",
 	"discordLink": "",
-	"lockdown": false
+	"lockdown": false,
+	"discord-log": true
 }
