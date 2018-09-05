@@ -4,7 +4,7 @@
 	   =========================================================
 	*/
 
-	$clientId = "Not for you c:";
+	$clientId = "YourClientID";
 	$configPath = $clientId . "/" . $clientId . "-config.json";
 
 	/* =========================================================
